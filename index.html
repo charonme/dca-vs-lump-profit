@@ -1,147 +1,22 @@
 <!DOCTYPE html>
 <html><head><title>DCA vs lump sum comparison</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="daily_sp500.js"></script>
 <script type="text/javascript">
-var data = [ //https://www.multpl.com/s-p-500-historical-prices/table/by-month
-	//2024sep    aug      jul      jun      may      apr      mar      feb      jan
-	5528.93, 5478.21, 5538.00, 5415.14, 5235.22, 5112.49, 5170.57, 5011.96, 4804.49,
-	4685.05, 4460.06, 4258.98, 4409.10, 4426.24, 4508.08, 4345.37, 4146.17, 4121.47, 3968.56, 4079.68, 3960.66, //2023
-	3912.38, 3917.49, 3726.05, 3850.52, 4158.56, 3911.73, 3898.95, 4040.36, 4391.30, 4391.27, 4435.98, 4573.82,
-	4674.77, 4667.39, 4460.71, 4445.54, 4454.21, 4363.71, 4238.49, 4167.85, 4141.18, 3910.51, 3883.43, 3793.75,
-	3695.31, 3548.99, 3418.70, 3365.52, 3391.71, 3207.62, 3104.66, 2919.61, 2761.98, 2652.39, 3277.31, 3278.20, //2020
-	3176.75, 3104.90, 2977.68, 2982.16, 2897.50, 2996.11, 2890.17, 2854.71, 2903.80, 2803.98, 2754.86, 2607.39,
-	2567.31, 2723.23, 2785.46, 2901.50, 2857.82, 2793.64, 2754.35, 2701.49, 2653.63, 2702.77, 2705.16, 2789.80,
-	2664.34, 2593.61, 2557.00, 2492.84, 2456.22, 2454.10, 2433.99, 2395.35, 2359.31, 2366.82, 2329.91, 2275.12,
-	2246.63, 2164.99, 2143.02, 2157.69, 2170.95, 2148.90, 2083.89, 2065.55, 2075.54, 2021.95, 1904.42, 1918.60,
-	2054.08, 2080.62, 2024.81, 1944.41, 2039.87, 2094.14, 2099.29, 2111.94, 2094.86, 2079.99, 2082.20, 2028.18,
-	2054.27, 2044.57, 1937.27, 1993.23, 1961.53, 1973.10, 1947.09, 1889.77, 1864.26, 1863.52, 1817.04, 1822.36,
-	1807.78, 1783.54, 1720.03, 1687.17, 1670.09, 1668.68, 1618.77, 1639.84, 1570.70, 1550.83, 1512.31, 1480.40,
-	1422.29, 1394.51, 1437.82, 1443.42, 1403.45, 1359.78, 1323.48, 1341.27, 1386.43, 1389.24, 1352.49, 1300.58,
-	1243.32, 1226.42, 1207.22, 1173.88, 1185.31, 1325.19, 1287.29, 1338.31, 1331.51, 1304.49, 1321.12, 1282.62,
-	1241.53, 1198.89, 1171.58, 1122.08, 1087.28, 1079.80, 1083.36, 1125.06, 1197.32, 1152.05, 1089.16, 1123.58, //2010
-	1110.38, 1088.07, 1067.66, 1044.55, 1009.73, 935.82, 926.12, 902.41, 848.15, 757.13, 805.23, 865.58,
-	877.56, 883.04, 968.80, 1216.95, 1281.47, 1257.33, 1341.25, 1403.22, 1370.47, 1316.94, 1354.87, 1378.76,
-	1479.22, 1463.39, 1539.66, 1497.12, 1454.62, 1520.71, 1514.19, 1511.14, 1463.64, 1406.95, 1444.80, 1424.16,
-	1416.42, 1388.64, 1363.38, 1317.74, 1287.15, 1260.24, 1253.17, 1290.01, 1302.17, 1293.74, 1276.65, 1278.73,
-	1262.07, 1237.37, 1191.96, 1225.92, 1224.27, 1222.24, 1202.25, 1178.28, 1164.43, 1194.90, 1199.63, 1181.41,
-	1199.21, 1168.94, 1117.21, 1117.66, 1088.94, 1105.85, 1132.76, 1102.78, 1133.36, 1123.98, 1143.36, 1132.52,
-	1080.64, 1049.90, 1038.73, 1019.44, 989.53, 992.54, 988.00, 935.96, 890.03, 846.63, 837.03, 895.84,
-	899.18, 909.93, 854.63, 867.81, 912.55, 903.59, 1014.02, 1079.25, 1111.93, 1153.79, 1100.67, 1140.21,
-	1144.93, 1129.68, 1076.59, 1044.64, 1178.50, 1204.45, 1238.71, 1270.37, 1189.84, 1185.85, 1305.75, 1335.63,
-	1330.93, 1378.04, 1390.14, 1468.05, 1485.46, 1473.00, 1461.96, 1418.48, 1461.36, 1442.21, 1388.87, 1425.59, //2000
-	1428.68, 1391.00, 1300.01, 1318.17, 1327.49, 1380.99, 1322.55, 1332.07, 1334.76, 1281.66, 1246.58, 1248.77,
-	1190.05, 1144.43, 1032.47, 1020.64, 1074.62, 1156.58, 1108.39, 1108.42, 1112.20, 1076.83, 1023.74, 963.36,
-	962.37, 938.92, 951.16, 937.02, 927.24, 925.29, 876.29, 833.09, 763.93, 792.16, 798.39, 766.22,
-	743.25, 735.67, 701.46, 674.88, 662.68, 644.07, 668.50, 661.23, 647.17, 647.07, 649.54, 614.42,
-	614.57, 595.53, 582.92, 578.77, 559.11, 557.37, 539.35, 523.81, 507.91, 493.15, 481.92, 465.25,
-	455.19, 461.01, 463.81, 466.96, 464.24, 451.40, 454.83, 450.90, 447.23, 463.81, 471.58, 472.99,
-	465.95, 462.89, 463.90, 459.24, 454.13, 447.29, 448.06, 445.25, 443.08, 450.16, 441.70, 435.23,
-	435.64, 422.84, 412.50, 418.48, 417.93, 415.05, 408.27, 414.81, 407.41, 407.36, 412.56, 416.08,
-	388.51, 385.92, 386.88, 387.20, 389.40, 380.23, 378.29, 377.99, 379.68, 372.28, 362.26, 325.49,
-	328.75, 315.29, 307.12, 315.41, 330.75, 360.03, 360.39, 350.25, 338.18, 338.46, 330.45, 339.97, //1990
-	348.60, 340.20, 347.40, 347.30, 346.60, 331.90, 323.70, 313.90, 302.30, 292.70, 294.00, 285.40,
-	276.50, 271.00, 277.40, 268.00, 263.70, 269.10, 270.70, 256.10, 262.60, 265.70, 258.10, 250.50,
-	241.00, 245.00, 280.20, 318.70, 329.40, 310.10, 301.40, 289.10, 289.30, 292.50, 280.90, 264.50,
-	248.60, 245.10, 237.40, 238.30, 245.00, 240.20, 245.30, 238.50, 238.00, 232.30, 219.40, 208.20,
-	207.30, 197.50, 186.20, 184.10, 188.30, 192.50, 188.90, 184.90, 180.60, 179.40, 180.90, 171.60,
-	164.50, 166.30, 164.80, 166.10, 164.40, 151.10, 153.10, 156.60, 157.60, 157.40, 157.30, 166.40,
-	164.40, 165.20, 167.70, 167.20, 162.40, 167.00, 166.40, 164.10, 157.70, 151.90, 146.80, 144.30,
-	139.40, 138.10, 132.70, 122.40, 109.70, 109.40, 109.70, 116.40, 116.30, 110.80, 114.50, 117.30,
-	123.80, 122.90, 119.80, 118.30, 129.60, 129.10, 132.30, 131.70, 134.40, 133.20, 128.40, 133.00,
-	133.50, 135.70, 130.20, 126.50, 123.50, 119.80, 114.60, 107.70, 103.00, 104.70, 115.30, 110.90, //1980
-	107.80, 103.70, 104.50, 108.60, 107.40, 102.70, 101.70, 99.73, 102.10, 100.10, 98.23, 99.71,
-	96.11, 94.71, 100.60, 103.90, 103.90, 97.19, 97.66, 97.41, 92.71, 88.82, 88.98, 90.25,
-	93.82, 94.28, 93.74, 96.23, 97.75, 100.20, 99.29, 98.76, 99.05, 100.60, 101.00, 103.80,
-	104.70, 101.20, 101.90, 105.50, 103.30, 104.20, 101.80, 101.20, 101.90, 101.10, 100.60, 96.86,
-	88.70, 90.07, 88.57, 84.67, 85.71, 92.49, 92.40, 90.10, 84.72, 83.78, 80.10, 72.56,
-	67.07, 71.74, 69.44, 68.12, 76.03, 79.31, 89.79, 89.67, 92.46, 97.44, 93.45, 96.11,
-	94.78, 102.00, 109.80, 105.60, 103.80, 105.80, 104.80, 107.20, 110.30, 112.40, 114.20, 118.40,
-	117.50, 115.10, 109.60, 109.40, 111.00, 107.20, 108.00, 107.70, 108.80, 107.70, 105.20, 103.30,
-	99.17, 92.78, 97.29, 99.40, 97.24, 99.00, 99.72, 101.60, 103.00, 99.60, 97.11, 93.49,
-	90.05, 84.28, 84.37, 82.58, 77.92, 75.72, 75.59, 76.06, 85.95, 88.65, 87.16, 90.31, //1970
-	91.11, 96.21, 95.52, 94.51, 94.18, 94.71, 99.14, 104.60, 101.30, 99.30, 101.50, 102.00,
-	106.50, 105.40, 103.80, 101.30, 98.11, 100.30, 100.50, 97.87, 95.67, 89.09, 90.75, 95.04,
-	95.30, 92.66, 95.66, 95.81, 94.49, 93.01, 91.43, 92.59, 90.96, 89.42, 87.36, 84.45,
-	81.33, 80.99, 77.13, 77.81, 80.65, 85.84, 86.06, 86.78, 91.60, 88.88, 92.69, 93.32,
-	91.73, 92.15, 91.39, 89.38, 86.49, 84.91, 85.04, 89.28, 87.97, 86.83, 86.75, 86.12,
-	83.96, 85.44, 84.85, 83.41, 82.00, 83.22, 80.24, 80.72, 79.94, 78.80, 77.39, 76.45,
-	74.17, 72.62, 73.03, 72.85, 70.98, 69.07, 70.11, 70.14, 68.76, 65.67, 65.92, 65.06,
-	62.64, 60.04, 56.17, 58.00, 58.52, 56.97, 55.63, 62.99, 68.05, 70.29, 70.22, 69.07,
-	71.74, 71.08, 68.00, 67.26, 67.79, 65.44, 65.62, 66.50, 65.83, 64.12, 62.17, 59.72,
-	56.80, 55.47, 53.73, 54.81, 56.51, 55.84, 57.26, 55.22, 55.73, 55.02, 55.78, 58.03, //1960
-	59.06, 57.23, 57.00, 57.05, 59.40, 59.74, 57.46, 57.96, 57.10, 56.16, 54.77, 55.62,
-	53.49, 52.50, 50.95, 48.96, 47.70, 45.98, 44.75, 43.70, 42.34, 42.11, 41.26, 41.12,
-	40.33, 40.35, 41.24, 43.98, 45.84, 48.51, 47.55, 46.78, 45.05, 44.03, 43.47, 45.43,
-	46.44, 45.76, 46.24, 46.84, 48.49, 48.78, 46.27, 46.54, 48.05, 47.49, 44.43, 44.15,
-	45.37, 44.95, 42.11, 44.34, 42.43, 42.69, 39.78, 37.60, 37.76, 36.50, 36.79, 35.60,
-	34.97, 33.44, 32.18, 31.45, 30.73, 30.13, 28.96, 28.73, 27.63, 26.57, 26.02, 25.46,
-	24.83, 24.50, 23.97, 23.27, 24.39, 24.29, 23.95, 24.84, 24.71, 25.99, 25.86, 26.18,
-	26.04, 25.03, 24.26, 24.78, 25.18, 25.08, 24.38, 23.73, 23.74, 23.81, 23.75, 24.19,
-	23.41, 22.71, 23.36, 23.48, 22.89, 21.93, 21.55, 21.93, 21.92, 21.63, 22.00, 21.21,
-	19.75, 19.83, 19.87, 19.08, 18.43, 17.38, 18.74, 18.44, 17.84, 17.35, 17.21, 16.88, //1950
-	16.54, 16.11, 15.89, 15.49, 15.29, 14.76, 13.97, 14.78, 14.89, 14.91, 14.77, 15.36,
-	15.19, 15.29, 16.19, 15.76, 15.94, 16.42, 16.82, 16.15, 15.40, 14.30, 14.10, 14.83,
-	15.03, 15.27, 15.45, 15.06, 15.46, 15.77, 14.84, 14.34, 14.60, 15.16, 15.80, 15.21,
-	15.13, 14.69, 14.75, 15.09, 17.70, 18.05, 18.58, 18.70, 18.66, 17.53, 18.07, 18.02,
-	17.33, 17.04, 16.50, 15.84, 14.83, 14.78, 15.09, 14.82, 14.28, 13.93, 13.94, 13.49,
-	13.10, 12.82, 12.91, 12.60, 12.81, 13.00, 12.67, 12.10, 11.89, 12.10, 11.77, 11.85,
-	11.48, 11.33, 11.88, 11.99, 11.74, 12.35, 12.10, 11.89, 11.44, 11.07, 10.69, 10.09,
-	9.52, 9.47, 9.32, 8.68, 8.59, 8.64, 8.33, 7.93, 7.84, 8.18, 8.65, 8.93,
-	8.76, 9.37, 9.83, 10.24, 10.21, 10.26, 9.76, 9.43, 9.64, 9.95, 9.89, 10.55,
-	10.53, 10.98, 10.73, 10.63, 10.20, 9.99, 9.67, 10.58, 12.27, 12.15, 12.22, 12.30, //1940
-	12.37, 12.67, 12.90, 12.77, 11.54, 11.71, 11.43, 11.23, 10.83, 12.39, 12.40, 12.50,
-	12.69, 13.07, 13.06, 11.75, 12.31, 12.24, 10.21, 9.98, 9.89, 10.31, 11.04, 11.31,
-	11.02, 11.20, 12.28, 14.37, 16.74, 16.57, 15.64, 16.25, 17.01, 18.09, 18.11, 17.59,
-	17.06, 17.36, 16.89, 16.05, 15.87, 15.56, 14.69, 14.09, 14.88, 14.86, 14.55, 13.76,
-	13.04, 13.04, 11.92, 11.61, 11.37, 10.65, 10.12, 9.75, 9.04, 8.41, 8.98, 9.26,
-	9.26, 9.20, 8.95, 8.88, 9.10, 9.47, 9.94, 9.81, 10.92, 10.74, 11.32, 10.54,
-	9.97, 9.78, 9.55, 10.58, 10.67, 11.23, 10.39, 8.87, 6.89, 6.23, 6.25, 7.09,
-	6.82, 7.05, 7.12, 8.26, 7.53, 5.01, 4.77, 5.51, 6.28, 8.26, 8.23, 8.30,
-	8.44, 10.39, 10.25, 11.83, 13.90, 14.33, 13.87, 14.33, 15.86, 17.53, 17.20, 15.98,
-	15.51, 16.62, 17.92, 20.78, 20.79, 21.06, 21.52, 23.94, 25.46, 23.94, 23.07, 21.71, //1930
-	21.40, 20.58, 27.99, 31.30, 30.10, 28.48, 26.15, 25.66, 25.28, 25.43, 24.99, 24.86,
-	23.15, 23.06, 21.60, 21.17, 19.78, 19.16, 19.02, 20.00, 19.40, 18.25, 17.32, 17.53,
-	17.46, 17.06, 16.68, 16.94, 16.03, 15.22, 14.89, 14.70, 14.21, 13.87, 13.66, 13.40,
-	13.49, 13.19, 13.02, 13.32, 13.12, 12.62, 12.11, 11.56, 11.48, 11.81, 12.67, 12.65,
-	12.46, 12.26, 11.89, 11.51, 11.25, 11.10, 10.80, 10.61, 10.28, 10.39, 10.67, 10.58,
-	10.16, 9.64, 9.13, 9.25, 9.34, 9.03, 8.63, 8.47, 8.50, 8.70, 8.87, 8.83,
-	8.55, 8.27, 8.03, 8.15, 8.10, 8.06, 8.34, 8.67, 9.10, 9.43, 9.28, 8.90,
-	8.78, 8.80, 9.26, 9.06, 8.83, 8.51, 8.45, 8.53, 8.21, 7.74, 7.46, 7.30,
-	7.31, 7.06, 6.70, 6.61, 6.45, 6.53, 6.55, 7.12, 6.91, 6.88, 7.06, 7.11,
-	6.81, 7.48, 7.88, 7.87, 7.60, 7.91, 7.92, 8.06, 8.60, 8.67, 8.10, 8.83, //1920
-	8.92, 9.19, 9.47, 9.01, 8.87, 9.51, 9.21, 8.97, 8.39, 8.12, 7.88, 7.85,
-	7.90, 8.06, 7.86, 7.54, 7.58, 7.51, 7.45, 7.44, 7.21, 7.28, 7.43, 7.21,
-	6.80, 7.04, 7.68, 8.12, 8.53, 8.79, 9.04, 8.86, 9.17, 9.31, 9.03, 9.57,
-	9.80, 10.21, 9.98, 9.68, 9.30, 9.23, 9.36, 9.27, 9.07, 9.17, 9.20, 9.33,
-	9.48, 9.46, 9.14, 8.66, 8.35, 8.01, 8.04, 7.95, 8.14, 7.57, 7.38, 7.48,
-	7.35, 7.68, 7.68, 7.68, 7.68, 7.68, 8.13, 8.17, 8.12, 8.32, 8.48, 8.37,
-	8.04, 8.05, 8.26, 8.53, 8.45, 8.23, 8.12, 8.55, 8.79, 8.80, 8.97, 9.30,
-	9.38, 9.73, 9.84, 9.86, 9.81, 9.59, 9.58, 9.58, 9.59, 9.30, 9.04, 9.12,
-	9.11, 9.07, 8.72, 8.67, 9.17, 9.63, 9.67, 9.48, 9.28, 9.32, 9.43, 9.27,
-	9.05, 9.31, 9.32, 8.91, 8.85, 8.64, 9.10, 9.56, 9.72, 9.96, 9.72, 10.08, //1910
-	10.30, 10.18, 10.23, 10.19, 10.18, 9.94, 9.80, 9.63, 9.32, 8.92, 8.80, 9.06,
-	9.03, 8.83, 8.27, 8.17, 8.26, 7.92, 7.64, 7.63, 7.24, 6.87, 6.60, 6.85,
-	6.57, 6.25, 6.64, 7.45, 7.53, 8.14, 7.84, 8.10, 8.39, 8.35, 9.26, 9.56,
-	9.84, 9.93, 9.73, 10.03, 9.73, 9.06, 9.30, 9.18, 9.43, 9.56, 9.80, 9.87,
-	9.54, 9.31, 9.36, 9.23, 9.20, 8.87, 8.60, 8.50, 8.94, 9.05, 8.80, 8.43,
-	8.25, 8.17, 7.75, 7.32, 7.01, 6.78, 6.51, 6.50, 6.64, 6.48, 6.50, 6.68,
-	6.57, 6.28, 6.26, 6.47, 6.63, 6.85, 7.18, 7.60, 7.75, 8.08, 8.41, 8.46,
-	8.05, 8.24, 8.57, 8.85, 8.83, 8.60, 8.41, 8.46, 8.48, 8.20, 8.19, 8.12,
-	7.95, 8.08, 7.91, 8.00, 8.04, 7.93, 8.50, 7.73, 8.14, 7.51, 7.25, 7.07,
-	6.87, 6.48, 6.01, 5.80, 5.94, 5.86, 5.86, 6.04, 6.34, 6.26, 6.21, 6.10, //1900
-	//dec  nov   oct   sep   aug   jul   jun   may   apr   mar   feb   jan
-];
+const DATE = 0;
+const VALUE = 1;
 var lumpProfits = [];
 var dcaProfits = [];
-var startYear = 1900;
+var dcaChartStep = 1;
 var startIndex = 0;
 var overlayX = 0;
-var minZoomEdge = 100; zoomStep = 10; scrollStep = 10; scrollThreshold = 5;
-var endIndex = data.length - 1;
+var zoomRatio = 0.05; scrollRatio = 0.05; scrollThreshold = 20;
+var endIndex;
 var mainChartCanvas, mainChartCtx, mainChartCanvasRect;
-var dataMax, dataMin, dcaLength = 1;
+var dataMax, dataMin, dcaLength, dcaNumber, dcaPeriod;
 var dcaChartCanvas, dcaChartCtx;
 var width, height;
+var mainChartLogBase = 0;
 function resize() {
 	width = document.body.clientWidth;
 	height = 400;
@@ -158,7 +33,70 @@ function resize() {
 	drawDca();
 	drawOverlay();
 }
+
+function dcaPeriodHandler(event, obj) {
+	if (event.type === 'change' || event.buttons) {
+		dcaPeriod = Math.max(1, parseInt(obj.value));
+		document.getElementById('dcaPeriod').value = dcaPeriod;
+		document.getElementById('dcaPeriodInput').value = dcaPeriod;
+		dcaLength = dcaPeriod * dcaNumber;
+		drawDca();
+		drawOverlay();
+	}
+}
+
+function dcaNumberHandler(event, obj) {
+	if (event.type === 'change' || event.buttons) {
+		dcaNumber = Math.max(1, parseInt(obj.value));
+		document.getElementById('dcaNumber').value = dcaNumber;
+		document.getElementById('dcaNumberInput').value = dcaNumber;
+		dcaLength = dcaPeriod * dcaNumber;
+		drawDca();
+		drawOverlay();
+	}
+}
+
 function init() {
+	if (typeof data !== 'object' || !Array.isArray(data) || data.length < 200) {
+		alert('data failed to load');
+		return false;
+	}
+	endIndex = data.length - 1;
+
+	document.getElementById('dcaPeriod').addEventListener('mousemove', function(event) {
+		dcaPeriodHandler(event, this);
+	});
+	document.getElementById('dcaPeriod').addEventListener('change', function(event) {
+		dcaPeriodHandler(event, this);
+	});
+	document.getElementById('dcaPeriodInput').addEventListener('change', function(event) {
+		dcaPeriodHandler(event, this);
+	});
+
+	document.getElementById('dcaNumber').addEventListener('mousemove', function(event) {
+		dcaNumberHandler(event, this);
+	});
+	document.getElementById('dcaNumber').addEventListener('change', function(event) {
+		dcaNumberHandler(event, this);
+	});
+	document.getElementById('dcaNumberInput').addEventListener('change', function(event) {
+		dcaNumberHandler(event, this);
+	});
+	dcaPeriod = Math.max(1, parseInt(document.getElementById('dcaPeriod').value));
+	document.getElementById('dcaPeriodInput').value = dcaPeriod;
+	dcaNumber = Math.max(1, parseInt(document.getElementById('dcaNumber').value));
+	document.getElementById('dcaNumberInput').value = dcaNumber;
+	dcaLength = dcaPeriod * dcaNumber;
+
+
+	dataMax = 0; dataMin = Number.MAX_SAFE_INTEGER;
+	for (i in data) {
+		if (data[i][VALUE] > dataMax) dataMax = data[i][VALUE];
+		if (data[i][VALUE] < dataMin) dataMin = data[i][VALUE];
+	}
+	mainChartLogBase = Math.log(dataMax - dataMin + 1);
+
+
 	mainChartCanvas = document.getElementById('mainChartCanvas');
 	mainChartCtx = mainChartCanvas.getContext('2d');
 
@@ -168,27 +106,33 @@ function init() {
 	overlayCanvas = document.getElementById('overlayCanvas');
 	overlayCtx = overlayCanvas.getContext('2d');
 
-	dcaLength = document.getElementById('dcaLength').value;
-	document.getElementById('num1').value = dcaLength;
-
 	window.addEventListener('resize', resize);
 	resize();
 
 	function overlayMoveHandler(event) {
 		var redraw = false;
-		if (event.clientX < scrollThreshold && endIndex < data.length - 1) {
-			startIndex = startIndex + scrollStep;
-			endIndex = Math.min(endIndex + scrollStep, data.length - 1);
-			redraw = true;
-		} else if (event.clientX > overlayCanvasRect.left + width - scrollThreshold && startIndex > 0) {
+		if (
+			event.clientX < scrollThreshold
+			&& startIndex > 0
+		) {
+			var scrollStep = Math.round((endIndex - startIndex) * scrollRatio);
+			//scroll left
 			endIndex = endIndex - scrollStep;
 			startIndex = Math.max(0, startIndex - scrollStep);
+			redraw = true;
+		} else if (
+			event.clientX > overlayCanvasRect.left + width - scrollThreshold
+			&& endIndex < data.length - 1
+		) {
+			var scrollStep = Math.round((endIndex - startIndex) * scrollRatio);
+			//scroll right
+			startIndex = startIndex + scrollStep;
+			endIndex = Math.min(endIndex + scrollStep, data.length - 1);
 			redraw = true;
 		}
 		if (redraw) {
 			drawChart();
 			drawDca();
-			//setTimeout(overlayMoveHandler(event), 10);
 		}
 	}
 
@@ -201,173 +145,232 @@ function init() {
 		event.stopPropagation();
         event.preventDefault();
         event.cancelBubble = false;
-		if (event.deltaY < 0) {
-			startIndex = Math.max(0, startIndex - zoomStep);
-			endIndex = Math.min(data.length - 1, endIndex + zoomStep);
-		} else if (event.deltaY > 0) {
-			startIndex = Math.min(startIndex + zoomStep, endIndex - minZoomEdge);
-			endIndex = Math.max(endIndex - zoomStep, startIndex + minZoomEdge);
-		} else if (event.deltaX > 0 && startIndex > 0) {
+
+		if (
+			(event.deltaX > 0 || (event.shiftKey && event.deltaY > 0))
+			&& startIndex > 0
+		) { //scroll right
+			var scrollStep = Math.round((endIndex - startIndex) * scrollRatio);
 			endIndex = endIndex - scrollStep;
 			startIndex = Math.max(0, startIndex - scrollStep);
-		} else if (event.deltaX < 0 && endIndex < data.length - 1) {
+		} else if (
+			(event.deltaX < 0 || (event.shiftKey && event.deltaY < 0))
+			&& endIndex < data.length - 1
+		) { //scroll left
+			var scrollStep = Math.round((endIndex - startIndex) * scrollRatio);
 			startIndex = startIndex + scrollStep;
 			endIndex = Math.min(endIndex + scrollStep, data.length - 1);
+		} else if (event.deltaY > 0) { //zoom out
+			var zoomStep = Math.round((endIndex - startIndex) * zoomRatio);
+			startIndex = Math.max(0, startIndex - zoomStep);
+			endIndex = Math.min(data.length - 1, endIndex + zoomStep);
+		} else if (event.deltaY < 0) { //zoom in
+			var zoomStep = (endIndex - startIndex) * zoomRatio;
+			var zoomBias = (event.clientX - overlayCanvasRect.left) / width;
+			startIndex = Math.min(Math.round(startIndex + zoomStep * zoomBias), endIndex);
+			endIndex = Math.max(Math.round(endIndex - zoomStep * (1 - zoomBias)), startIndex);
 		}
+
 		drawChart();
 		drawDca();
 		drawOverlay();
 		return false;
 	});
 }
+function getXFromI(i) {
+	return Math.round((width / (endIndex - startIndex + 1)) * (i - startIndex));
+}
+function getIFromX(x) {
+	return Math.round((x / width) * (endIndex - startIndex + 1) + startIndex);
+}
 function drawOverlay() {
 	overlayCtx.clearRect(0, 0, width, height);
-	var i = Math.round((1 - overlayX / width) * (endIndex - startIndex));
-	if (i > dcaLength) {
+	var i = getIFromX(overlayX);
+	i = i - (i - startIndex) % dcaChartStep;
+	var x = getXFromI(i);
+	if (i + dcaLength < data.length) {
+		overlayCtx.beginPath();
+		overlayCtx.moveTo(x+0.5, 0);
+		overlayCtx.lineTo(x+0.5, height);
+		overlayCtx.lineWidth = 1;
+		overlayCtx.strokeStyle = 'rgb(60, 255, 60)';
+		overlayCtx.stroke();
+
 		overlayCtx.fillStyle = 'rgba(60, 255, 60, 0.2)';
 		overlayCtx.fillRect(
-			overlayX, 0,
+			x, 0,
 			Math.round(width/(endIndex - startIndex + 1)*dcaLength), height
 		);
 		var textXOffset = 0;
-		if (overlayX > width * 0.5) {
-			textXOffset = dcaLength * width / (endIndex - startIndex + 1);
+		if (x > width * 0.5) {
+			//textXOffset = dcaLength * width / (endIndex - startIndex + 1);
 			overlayCtx.textAlign = 'end';
 		} else {
 			overlayCtx.textAlign = 'start';
 		}
 		overlayCtx.font = '12px Arial';
 		overlayCtx.fillStyle = 'blue';
-		overlayCtx.fillText('lump sum profit '+Math.round(lumpProfits[i],1)+'%', overlayX+textXOffset, 14);
+		overlayCtx.fillText('lump sum profit: '+Math.round(lumpProfits[i],1)+'%', x+textXOffset, 14);
 		overlayCtx.fillStyle = 'red';
-		overlayCtx.fillText('DCA profit '+Math.round(dcaProfits[i],1)+'%', overlayX+textXOffset, 26);
+		overlayCtx.fillText('DCA profit: '+Math.round(dcaProfits[i],1)+'%', x+textXOffset, 26);
+		overlayCtx.fillStyle = 'black';
+		overlayCtx.fillText(data[i][DATE]+' price: $'+data[i][VALUE], x+textXOffset, 38);
+		overlayCtx.fillText(data[i + dcaLength][DATE]+' price: $'+data[i + dcaLength][VALUE], x+textXOffset, 50);
 	}
 }
 function drawChart() {
 
-	dataMax = 0; dataMin = Number.MAX_SAFE_INTEGER;
+	viewMax = 0; viewMin = Number.MAX_SAFE_INTEGER;
 	for (i = startIndex; i <= endIndex; i++) {
-		if (data[i] > dataMax) dataMax = data[i];
-		if (data[i] < dataMin) dataMin = data[i];
+		if (data[i][VALUE] > viewMax) viewMax = data[i][VALUE];
+		if (data[i][VALUE] < viewMin) viewMin = data[i][VALUE];
 	}
+	if (viewMax-viewMin < 2) {
+		viewMax+= 10;
+		viewMin-= 10;
+	}
+	viewMax = Math.log(viewMax - dataMin + 1) / mainChartLogBase;
+	viewMin = Math.log(viewMin - dataMin + 1) / mainChartLogBase;
+
 	mainChartCtx.clearRect(0, 0, width, height);
-	for (i = startIndex; i <= endIndex; i++) {
-		if ((data.length - i - 1) % 12 == 0) {
-			var y = Math.round((data.length - i - 1)/12) + startYear;
+
+	var cnt = 0;
+	var step = Math.max(1, Math.round((endIndex - startIndex + 1) / width));
+	var printAllYears = (365 * width / (endIndex - startIndex + 1)) > 38;
+	var oldX, oldY, oldYr = -1;
+	for (var i = startIndex; i <= endIndex; i+=step) {
+		var x = getXFromI(i);
+		var d = new Date(data[i][DATE]);
+		var yr = d.getFullYear();
+		if (yr > oldYr) {
 			mainChartCtx.beginPath();
-			var x = Math.round(width - (width / (endIndex - startIndex + 1)) * (i - startIndex));
-			mainChartCtx.moveTo(x, 0);
-			mainChartCtx.lineTo(x, height);
-			mainChartCtx.lineWidth = 0.5;
-			if (y%10 == 0) {
+			mainChartCtx.moveTo(x+0.5, 0);
+			mainChartCtx.lineTo(x+0.5, height);
+			mainChartCtx.lineWidth = 0.8;
+			if (yr % 10 == 0) {
 				mainChartCtx.font = '10px Arial';
 				mainChartCtx.fillStyle = 'black';
-				mainChartCtx.fillText(y, x+1, height-1);
+				mainChartCtx.fillText(yr, x+1, height-1);
 				mainChartCtx.strokeStyle = 'black';
+			} else if (printAllYears) {
+				mainChartCtx.font = '10px Arial';
+				mainChartCtx.fillStyle = 'DimGray';
+				mainChartCtx.fillText(yr, x+1, height-1);
+				mainChartCtx.strokeStyle = 'silver';
 			} else mainChartCtx.strokeStyle = 'silver';
-			mainChartCtx.stroke(); /* */
+			mainChartCtx.stroke();
 		}
-	}
+		oldYr = yr;
 
-	mainChartCtx.beginPath();
-	var cnt = 0;
-	var logBase = Math.log(dataMax - dataMin);
-	for (i = startIndex; i <= endIndex; i++) {
-		var x = Math.round((width/(endIndex - startIndex + 1)) * (endIndex - startIndex + 1 - cnt));
-		var y = height - Math.round(height * Math.log(data[i] - dataMin)/logBase)
-		if (cnt === 0) mainChartCtx.moveTo(x, y);
-		else mainChartCtx.lineTo(x, y);
+		var y = height - height * ((Math.log(data[i][VALUE] - dataMin + 1) / mainChartLogBase - viewMin) / (viewMax - viewMin));
+		if (cnt > 0) {
+			mainChartCtx.beginPath();
+			mainChartCtx.moveTo(oldX, oldY);
+			mainChartCtx.lineTo(x, y);
+			mainChartCtx.strokeStyle = 'dimGrey';
+			mainChartCtx.lineWidth = 0.6;
+			mainChartCtx.stroke();
+		}
+		oldX = x; oldY = y;
 		cnt++;
 	}
-	mainChartCtx.strokeStyle = 'dimGrey';
-	mainChartCtx.lineWidth = 0.5;
-	mainChartCtx.stroke();
 }
 function drawDca() {
-	var returnScale = 1;
-	var returnZeroOffsetY = Math.round(height * 0.7);
-	//dcaChartCtx.fillStyle = 'white';
-	dcaChartCtx.clearRect(0, 0, width, height);
 	var dcaDepositsSum = 100;
 	var dcaDeposit = dcaDepositsSum / dcaLength;
-	//var cnt = 0;
 
-	for (h = -100; (returnZeroOffsetY - h*returnScale) > 0; h+=10) {
+	var maxProfit = Number.MIN_SAFE_INTEGER;
+	var minProfit = Number.MAX_SAFE_INTEGER;
+
+	for (var i = 0; i < data.length; i++) {
+		dcaProfits[i] = 0;
+		lumpProfits[i] = 0;
+	}
+
+	dcaChartStep = parseInt(Math.round(Math.max(1, (endIndex - startIndex + 1) / width)));
+	for (var i = startIndex; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= dcaChartStep) {
+		var dcaVolume = 0;
+		for (j = 0; j < dcaLength; j++) {
+			dcaVolume += dcaDeposit / data[i + j][VALUE];
+		}
+		dcaProfits[i] = dcaVolume * data[i + dcaLength][VALUE] - dcaDepositsSum;
+		if (maxProfit < dcaProfits[i]) maxProfit = dcaProfits[i];
+		if (minProfit > dcaProfits[i]) minProfit = dcaProfits[i];
+
+		var lumpVolume = dcaDepositsSum / data[i][VALUE];
+		lumpProfits[i] = lumpVolume * data[i + dcaLength][VALUE] - dcaDepositsSum;
+		if (maxProfit < lumpProfits[i]) maxProfit = lumpProfits[i];
+		if (minProfit > lumpProfits[i]) minProfit = lumpProfits[i];
+	}
+	if (minProfit == maxProfit) {
+		minProfit-= dcaDepositSum / 20;
+		maxProfit+= dcaDepositSum / 20;
+	}
+
+	dcaChartCtx.clearRect(0, 0, width, height);
+	//fixed scaling: 1 division = 10%
+	var showTens = (height / (maxProfit - minProfit)) > 2.2;
+	for (var h = Math.floor(minProfit / 10)*10; h <= Math.ceil(maxProfit / 10)*10; h+= 10) {
 		dcaChartCtx.beginPath();
-		var y = Math.round(returnZeroOffsetY - returnScale * h);
-		dcaChartCtx.moveTo(0, y);
-		dcaChartCtx.lineTo(width, y);
+		var y = Math.round(height - (height/(maxProfit - minProfit) * (h - minProfit)));
+		dcaChartCtx.moveTo(0, y+0.5);
+		dcaChartCtx.lineTo(width, y+0.5);
 		dcaChartCtx.lineWidth = 1;
-		if (h === 0) dcaChartCtx.strokeStyle = 'black';
-		else if (h%100==0) {
+		if (h === 0) {
+			dcaChartCtx.font = '12px Arial';
+			dcaChartCtx.fillStyle = 'black';
+			dcaChartCtx.fillText('0', 2, y-2);
+			dcaChartCtx.strokeStyle = 'black';
+		} else if (h%100==0) {
 			dcaChartCtx.font = '10px Arial';
 			dcaChartCtx.fillStyle = 'black';
 			dcaChartCtx.fillText((h>0?'+':'')+h+'%', 2, y-2);
 			dcaChartCtx.strokeStyle = 'DimGray';
-		}
-		else dcaChartCtx.strokeStyle = 'LightGray';
+		} else if (showTens) {
+			dcaChartCtx.font = '10px Arial';
+			dcaChartCtx.fillStyle = 'DimGray';
+			dcaChartCtx.fillText((h>0?'+':'')+h+'%', 2, y-2);
+			dcaChartCtx.strokeStyle = 'LightGray';
+		} else dcaChartCtx.strokeStyle = 'LightGray';
 		dcaChartCtx.stroke();
-	}
-	for (i = endIndex; i >= Math.max(dcaLength - 1, startIndex); i--) {
-		var dcaVolume = 0;
-		for (j = 0; j < dcaLength; j++) {
-			dcaVolume += dcaDeposit / data[i - j];
-		}
-		dcaProfits[i] = dcaVolume * data[i - dcaLength] - dcaDepositsSum;
-	}
-	for (i = endIndex; i >= Math.max(dcaLength - 1, startIndex); i--) {
-		var lumpVolume = dcaDepositsSum / data[i];
-		lumpProfits[i] = lumpVolume * data[i - dcaLength] - dcaDepositsSum;
 	}
 
 	var oldX = 0;
-	var oldLumpY = Math.round(returnZeroOffsetY - returnScale * lumpProfits[endIndex]);
-	var oldDcaY = Math.round(returnZeroOffsetY - returnScale * dcaProfits[endIndex]);
+	var oldLumpY = Math.round(height - (height/(maxProfit - minProfit) * (lumpProfits[startIndex] - minProfit)));
+	var oldDcaY = Math.round(height - (height/(maxProfit - minProfit) * (dcaProfits[startIndex] - minProfit)));
 	var cnt = 0;
-	for (var i = endIndex - 1; i >= Math.max(dcaLength - 1, startIndex); i--) {
-		var x = (width/(endIndex - startIndex + 1)) * cnt;
-		var lumpY = Math.round(returnZeroOffsetY - returnScale * lumpProfits[i]);
-		var dcaY = Math.round(returnZeroOffsetY - returnScale * dcaProfits[i]);
+	for (var i = startIndex + dcaChartStep; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= dcaChartStep) {
+		var x = getXFromI(i); //(width/(endIndex - startIndex + 1)) * cnt;
+		/* */
+		if (dcaProfits[i] > lumpProfits[i] && oldX < x) {
+			dcaChartCtx.beginPath();
+			dcaChartCtx.moveTo(x+0.5, 0);
+			dcaChartCtx.lineTo(x+0.5, height);
+			dcaChartCtx.lineWidth = 0.9;
+			dcaChartCtx.strokeStyle = 'rgba(255, 70, 70, 0.2)';
+			dcaChartCtx.stroke();
+		}/* */
+		var lumpY = Math.round(height - (height/(maxProfit - minProfit) * (lumpProfits[i] - minProfit)));
+		var dcaY = Math.round(height - (height/(maxProfit - minProfit) * (dcaProfits[i] - minProfit)));
 		if (i%2) {
-			dcaChartCtx.beginPath();
-			dcaChartCtx.moveTo(oldX, oldLumpY);
-			dcaChartCtx.lineTo(x, lumpY);
-			dcaChartCtx.strokeStyle = 'blue';
-			dcaChartCtx.stroke();
-
-			dcaChartCtx.beginPath();
-			dcaChartCtx.moveTo(oldX, oldDcaY);
-			dcaChartCtx.lineTo(x, dcaY);
-			dcaChartCtx.strokeStyle = 'red';
-			dcaChartCtx.stroke();
+			drawProfit(oldX, x, oldLumpY, lumpY, 'blue');
+			drawProfit(oldX, x, oldDcaY, dcaY, 'red');
 		} else {
-			dcaChartCtx.beginPath();
-			dcaChartCtx.moveTo(oldX, oldDcaY);
-			dcaChartCtx.lineTo(x, dcaY);
-			dcaChartCtx.strokeStyle = 'red';
-			dcaChartCtx.stroke();
-
-			dcaChartCtx.beginPath();
-			dcaChartCtx.moveTo(oldX, oldLumpY);
-			dcaChartCtx.lineTo(x, lumpY);
-			dcaChartCtx.strokeStyle = 'blue';
-			dcaChartCtx.stroke();
+			drawProfit(oldX, x, oldDcaY, dcaY, 'red');
+			drawProfit(oldX, x, oldLumpY, lumpY, 'blue');
 		}
 		cnt++;
 		oldX = x;
 		oldDcaY = dcaY;
 		oldLumpY = lumpY;
 	}
-
-
 }
-function dcaHandler(event, obj) {
-	if (event.type === 'change' || event.buttons) {
-		document.getElementById('dcaLength').value = obj.value;
-		dcaLength = obj.value;
-		drawDca();
-		drawOverlay();
-	}
+function drawProfit(oldX, newX, oldY, newY, color) {
+	dcaChartCtx.beginPath();
+	dcaChartCtx.moveTo(oldX, oldY);
+	dcaChartCtx.lineTo(newX, newY);
+	dcaChartCtx.strokeStyle = color;
+	dcaChartCtx.stroke();
 }
 window.onload = init;
 </script></head><body>
@@ -377,7 +380,12 @@ window.onload = init;
 	<canvas id="overlayCanvas" width="1200" height="400" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
 </div>
 <br>
-<label for="num1">DCA period (months):</label><input id="num1" type="range" min="1" max="120" style="width:400px" value="1" onmousemove="dcaHandler(event, this);" onchange="dcaHandler(event, this);">
-<input type="text" id="dcaLength" value="1" onchange="document.getElementById('num1').value=this.value; dcaLength = this.value; drawDca();">
+<label for="dcaPeriodInput">DCA every</label>
+<input id="dcaPeriod" type="range" min="1" max="92" style="width:400px" value="7">
+<input type="text" id="dcaPeriodInput" value="7" style="width:40px">
+days,
+<label for="dcaNumberInput">Number of payments:</label>
+<input id="dcaNumber" type="range" min="1" max="60" style="width:400px" value="10">
+<input type="text" id="dcaNumberInput" value="10" style="width:40px">
 <br>
 </body></html>
