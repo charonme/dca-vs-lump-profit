@@ -17,6 +17,25 @@ var dataMax, dataMin, dcaLength, dcaNumber, dcaPeriod;
 var dcaChartCanvas, dcaChartCtx;
 var width, height;
 var mainChartLogBase = 0;
+
+var colorScheme = 0;
+const colorSchemas = {
+	'bg': ['white', 'black'],
+	'mainChart': ['dimGray', 'LightGray'],
+	'dcaChart': ['red', '#ff6030'],
+	'lumpChart': ['blue', '#50b0ff'],
+	'dcaWinsBg': ['rgba(255, 70, 70, 0.2)', 'rgba(255, 0, 0, 0.3)'],
+	'year10grid': ['black', 'DimGray'],
+	'year1grid': ['DimGray', '#404040'],
+	'monthGrid': ['LightGray', '#323232'],
+	'profit100': ['DimGray', 'DimGray'],
+	'profit10': ['LightGray', '#404040'],
+	'profit0': ['black', 'white'],
+	'text': ['black', 'white'],
+	'faintText': ['DimGray', 'silver'],
+	'overlayBg': ['', ''],
+};
+var colors = {};
 function resize() {
 	width = document.body.clientWidth;
 	height = 400;
@@ -57,6 +76,13 @@ function dcaNumberHandler(event, obj) {
 }
 
 function init() {
+	if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+	    colorScheme = 1;
+	}
+	for (i in colorSchemas) colors[i] = colorSchemas[i][colorScheme];
+	document.body.style.background = colors.bg;
+	document.body.style.color = colors.text;
+
 	if (typeof data !== 'object' || !Array.isArray(data) || data.length < 200) {
 		alert('data failed to load');
 		return false;
@@ -209,11 +235,11 @@ function drawOverlay() {
 			overlayCtx.textAlign = 'start';
 		}
 		overlayCtx.font = '12px Arial';
-		overlayCtx.fillStyle = 'blue';
+		overlayCtx.fillStyle = colors.lumpChart;
 		overlayCtx.fillText('lump sum profit: '+Math.round(lumpProfits[i],1)+'%', x+textXOffset, 14);
-		overlayCtx.fillStyle = 'red';
+		overlayCtx.fillStyle = colors.dcaChart;
 		overlayCtx.fillText('DCA profit: '+Math.round(dcaProfits[i],1)+'%', x+textXOffset, 26);
-		overlayCtx.fillStyle = 'black';
+		overlayCtx.fillStyle = colors.text;
 		overlayCtx.fillText(data[i][DATE]+' price: $'+data[i][VALUE], x+textXOffset, 38);
 		overlayCtx.fillText(data[i + dcaLength][DATE]+' price: $'+data[i + dcaLength][VALUE], x+textXOffset, 50);
 	}
@@ -237,7 +263,8 @@ function drawChart() {
 	var cnt = 0;
 	var step = Math.max(1, Math.round((endIndex - startIndex + 1) / width));
 	var printAllYears = (365 * width / (endIndex - startIndex + 1)) > 38;
-	var oldX, oldY, oldYr = -1;
+	var showMonthsGrid = (30 * width / (endIndex - startIndex + 1)) > 15;
+	var oldX, oldY, oldYr = -1, oldD = null;
 	for (var i = startIndex; i <= endIndex; i+=step) {
 		var x = getXFromI(i);
 		var d = new Date(data[i][DATE]);
@@ -249,25 +276,32 @@ function drawChart() {
 			mainChartCtx.lineWidth = 0.8;
 			if (yr % 10 == 0) {
 				mainChartCtx.font = '10px Arial';
-				mainChartCtx.fillStyle = 'black';
+				mainChartCtx.fillStyle = colors.text;
 				mainChartCtx.fillText(yr, x+1, height-1);
-				mainChartCtx.strokeStyle = 'black';
+				mainChartCtx.strokeStyle = colors.year10grid;
 			} else if (printAllYears) {
 				mainChartCtx.font = '10px Arial';
-				mainChartCtx.fillStyle = 'DimGray';
+				mainChartCtx.fillStyle = colors.faintText;
 				mainChartCtx.fillText(yr, x+1, height-1);
-				mainChartCtx.strokeStyle = 'silver';
-			} else mainChartCtx.strokeStyle = 'silver';
+				mainChartCtx.strokeStyle = colors.year1grid;
+			} else mainChartCtx.strokeStyle = colors.year1grid;
+			mainChartCtx.stroke();
+		} else if (showMonthsGrid && oldD !== null && oldD.getMonth() != d.getMonth()) {
+			mainChartCtx.beginPath();
+			mainChartCtx.moveTo(x+0.5, 0);
+			mainChartCtx.lineTo(x+0.5, height);
+			mainChartCtx.strokeStyle = colors.monthGrid;
 			mainChartCtx.stroke();
 		}
 		oldYr = yr;
+		oldD = d;
 
 		var y = height - height * ((Math.log(data[i][VALUE] - dataMin + 1) / mainChartLogBase - viewMin) / (viewMax - viewMin));
 		if (cnt > 0) {
 			mainChartCtx.beginPath();
 			mainChartCtx.moveTo(oldX, oldY);
 			mainChartCtx.lineTo(x, y);
-			mainChartCtx.strokeStyle = 'dimGrey';
+			mainChartCtx.strokeStyle = colors.mainChart;
 			mainChartCtx.lineWidth = 0.6;
 			mainChartCtx.stroke();
 		}
@@ -318,20 +352,20 @@ function drawDca() {
 		dcaChartCtx.lineWidth = 1;
 		if (h === 0) {
 			dcaChartCtx.font = '12px Arial';
-			dcaChartCtx.fillStyle = 'black';
+			dcaChartCtx.fillStyle = colors.profit0;
 			dcaChartCtx.fillText('0', 2, y-2);
-			dcaChartCtx.strokeStyle = 'black';
+			dcaChartCtx.strokeStyle = colors.profit0;
 		} else if (h%100==0) {
 			dcaChartCtx.font = '10px Arial';
-			dcaChartCtx.fillStyle = 'black';
+			dcaChartCtx.fillStyle = colors.text;
 			dcaChartCtx.fillText((h>0?'+':'')+h+'%', 2, y-2);
-			dcaChartCtx.strokeStyle = 'DimGray';
+			dcaChartCtx.strokeStyle = colors.profit100;
 		} else if (showTens) {
 			dcaChartCtx.font = '10px Arial';
-			dcaChartCtx.fillStyle = 'DimGray';
+			dcaChartCtx.fillStyle = colors.faintText;
 			dcaChartCtx.fillText((h>0?'+':'')+h+'%', 2, y-2);
-			dcaChartCtx.strokeStyle = 'LightGray';
-		} else dcaChartCtx.strokeStyle = 'LightGray';
+			dcaChartCtx.strokeStyle = colors.profit10;
+		} else dcaChartCtx.strokeStyle = colors.profit10;
 		dcaChartCtx.stroke();
 	}
 
@@ -347,17 +381,17 @@ function drawDca() {
 			dcaChartCtx.moveTo(x+0.5, 0);
 			dcaChartCtx.lineTo(x+0.5, height);
 			dcaChartCtx.lineWidth = 0.9;
-			dcaChartCtx.strokeStyle = 'rgba(255, 70, 70, 0.2)';
+			dcaChartCtx.strokeStyle = colors.dcaWinsBg;
 			dcaChartCtx.stroke();
 		}/* */
 		var lumpY = Math.round(height - (height/(maxProfit - minProfit) * (lumpProfits[i] - minProfit)));
 		var dcaY = Math.round(height - (height/(maxProfit - minProfit) * (dcaProfits[i] - minProfit)));
 		if (i%2) {
-			drawProfit(oldX, x, oldLumpY, lumpY, 'blue');
-			drawProfit(oldX, x, oldDcaY, dcaY, 'red');
+			drawProfit(oldX, x, oldLumpY, lumpY, colors.lumpChart);
+			drawProfit(oldX, x, oldDcaY, dcaY, colors.dcaChart);
 		} else {
-			drawProfit(oldX, x, oldDcaY, dcaY, 'red');
-			drawProfit(oldX, x, oldLumpY, lumpY, 'blue');
+			drawProfit(oldX, x, oldDcaY, dcaY, colors.dcaChart);
+			drawProfit(oldX, x, oldLumpY, lumpY, colors.lumpChart);
 		}
 		cnt++;
 		oldX = x;
