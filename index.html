@@ -7,11 +7,15 @@ const DATE = 0;
 const VALUE = 1;
 var lumpProfits = [];
 var dcaProfits = [];
+var lumpHistogram = [];
+var dcaHistogram = [];
+var histogramRanges;
 var dcaChartStep = 1;
 var startIndex = 0;
 var overlayX = 0;
 var zoomRatio = 0.05; scrollRatio = 0.05; scrollThreshold = 20;
 var endIndex;
+var histogramCanvas, histogramCtx;
 var mainChartCanvas, mainChartCtx, mainChartCanvasRect;
 var dataMax, dataMin, dcaLength, dcaNumber, dcaPeriod;
 var dcaChartCanvas, dcaChartCtx;
@@ -22,8 +26,8 @@ var colorScheme = 0;
 const colorSchemas = {
 	'bg': ['white', 'black'],
 	'mainChart': ['dimGray', 'LightGray'],
-	'dcaChart': ['red', '#ff6030'],
-	'lumpChart': ['blue', '#50b0ff'],
+	'dcaChart': ['red', '#e05000'],
+	'lumpChart': ['blue', '#60c0ff'],
 	'dcaWinsBg': ['rgba(255, 70, 70, 0.2)', 'rgba(255, 0, 0, 0.3)'],
 	'year10grid': ['black', 'DimGray'],
 	'year1grid': ['DimGray', '#404040'],
@@ -45,6 +49,8 @@ function resize() {
 	dcaChartCanvas.height = height;
 	overlayCanvas.width = width;
 	overlayCanvas.height = height;
+	histogramCanvas.width = Math.round(width / 2);
+	histogramCanvas.height = Math.round(height / 2);
 
 	overlayX = Math.round(width / 2);
 	overlayCanvasRect = overlayCanvas.getBoundingClientRect();
@@ -58,7 +64,7 @@ function dcaPeriodHandler(event, obj) {
 		dcaPeriod = Math.max(1, parseInt(obj.value));
 		document.getElementById('dcaPeriod').value = dcaPeriod;
 		document.getElementById('dcaPeriodInput').value = dcaPeriod;
-		dcaLength = dcaPeriod * dcaNumber;
+		dcaLength = dcaPeriod * (dcaNumber - 1);
 		drawDca();
 		drawOverlay();
 	}
@@ -66,10 +72,10 @@ function dcaPeriodHandler(event, obj) {
 
 function dcaNumberHandler(event, obj) {
 	if (event.type === 'change' || event.buttons) {
-		dcaNumber = Math.max(1, parseInt(obj.value));
+		dcaNumber = Math.max(2, parseInt(obj.value));
 		document.getElementById('dcaNumber').value = dcaNumber;
 		document.getElementById('dcaNumberInput').value = dcaNumber;
-		dcaLength = dcaPeriod * dcaNumber;
+		dcaLength = dcaPeriod * (dcaNumber - 1);
 		drawDca();
 		drawOverlay();
 	}
@@ -112,7 +118,7 @@ function init() {
 	document.getElementById('dcaPeriodInput').value = dcaPeriod;
 	dcaNumber = Math.max(1, parseInt(document.getElementById('dcaNumber').value));
 	document.getElementById('dcaNumberInput').value = dcaNumber;
-	dcaLength = dcaPeriod * dcaNumber;
+	dcaLength = dcaPeriod * (dcaNumber - 1);
 
 
 	dataMax = 0; dataMin = Number.MAX_SAFE_INTEGER;
@@ -131,6 +137,9 @@ function init() {
 
 	overlayCanvas = document.getElementById('overlayCanvas');
 	overlayCtx = overlayCanvas.getContext('2d');
+
+	histogramCanvas = document.getElementById('histogramCanvas');
+	histogramCtx = histogramCanvas.getContext('2d');
 
 	window.addEventListener('resize', resize);
 	resize();
@@ -227,21 +236,19 @@ function drawOverlay() {
 			x, 0,
 			Math.round(width/(endIndex - startIndex + 1)*dcaLength), height
 		);
-		var textXOffset = 0;
 		if (x > width * 0.5) {
-			//textXOffset = dcaLength * width / (endIndex - startIndex + 1);
 			overlayCtx.textAlign = 'end';
 		} else {
 			overlayCtx.textAlign = 'start';
 		}
 		overlayCtx.font = '12px Arial';
 		overlayCtx.fillStyle = colors.lumpChart;
-		overlayCtx.fillText('lump sum profit: '+Math.round(lumpProfits[i],1)+'%', x+textXOffset, 14);
+		overlayCtx.fillText('lump sum profit: '+Math.round(lumpProfits[i],1)+'%', x, 14);
 		overlayCtx.fillStyle = colors.dcaChart;
-		overlayCtx.fillText('DCA profit: '+Math.round(dcaProfits[i],1)+'%', x+textXOffset, 26);
+		overlayCtx.fillText('DCA profit: '+Math.round(dcaProfits[i],1)+'%', x, 26);
 		overlayCtx.fillStyle = colors.text;
-		overlayCtx.fillText(data[i][DATE]+' price: $'+data[i][VALUE], x+textXOffset, 38);
-		overlayCtx.fillText(data[i + dcaLength][DATE]+' price: $'+data[i + dcaLength][VALUE], x+textXOffset, 50);
+		overlayCtx.fillText(data[i][DATE]+' price: $'+data[i][VALUE], x, 38);
+		overlayCtx.fillText(data[i + dcaLength][DATE]+' price: $'+data[i + dcaLength][VALUE], x, 50);
 	}
 }
 function drawChart() {
@@ -264,6 +271,7 @@ function drawChart() {
 	var step = Math.max(1, Math.round((endIndex - startIndex + 1) / width));
 	var printAllYears = (365 * width / (endIndex - startIndex + 1)) > 38;
 	var showMonthsGrid = (30 * width / (endIndex - startIndex + 1)) > 15;
+	var showMonthNames = (30 * width / (endIndex - startIndex + 1)) > 42;
 	var oldX, oldY, oldYr = -1, oldD = null;
 	for (var i = startIndex; i <= endIndex; i+=step) {
 		var x = getXFromI(i);
@@ -281,12 +289,22 @@ function drawChart() {
 				mainChartCtx.strokeStyle = colors.year10grid;
 			} else if (printAllYears) {
 				mainChartCtx.font = '10px Arial';
-				mainChartCtx.fillStyle = colors.faintText;
+				if (showMonthNames) {
+					mainChartCtx.fillStyle = colors.text;
+					mainChartCtx.strokeStyle = colors.year10grid;
+				} else {
+					mainChartCtx.fillStyle = colors.faintText;
+					mainChartCtx.strokeStyle = colors.year1grid;
+				}
 				mainChartCtx.fillText(yr, x+1, height-1);
-				mainChartCtx.strokeStyle = colors.year1grid;
 			} else mainChartCtx.strokeStyle = colors.year1grid;
 			mainChartCtx.stroke();
 		} else if (showMonthsGrid && oldD !== null && oldD.getMonth() != d.getMonth()) {
+			if (showMonthNames && d.getMonth() > 0) {
+				mainChartCtx.font = '10px Arial';
+				mainChartCtx.fillStyle = colors.faintText;
+				mainChartCtx.fillText(d.toLocaleString('default', {month: 'short'}), x+1, height-1);
+			}
 			mainChartCtx.beginPath();
 			mainChartCtx.moveTo(x+0.5, 0);
 			mainChartCtx.lineTo(x+0.5, height);
@@ -309,38 +327,64 @@ function drawChart() {
 		cnt++;
 	}
 }
+var drawDcaTimer = null;
 function drawDca() {
+	if (drawDcaTimer !== null) clearTimeout(drawDcaTimer);
+	drawDcaTimer = setTimeout(calculateAndDrawDca, 1);
+}
+function calculateAndDrawDca() {
+
 	var dcaDepositsSum = 100;
-	var dcaDeposit = dcaDepositsSum / dcaLength;
+	var dcaDeposit = dcaDepositsSum / dcaNumber;
 
 	var maxProfit = Number.MIN_SAFE_INTEGER;
 	var minProfit = Number.MAX_SAFE_INTEGER;
-
 	for (var i = 0; i < data.length; i++) {
 		dcaProfits[i] = 0;
 		lumpProfits[i] = 0;
 	}
 
+	var totalDcaProfitsSum = 0, totalLumpProfitsSum = 0, totalProtitsCount = 0;
 	dcaChartStep = parseInt(Math.round(Math.max(1, (endIndex - startIndex + 1) / width)));
-	for (var i = startIndex; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= dcaChartStep) {
+	var maxHistogram = 0;
+
+	for (var i = startIndex; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= 1) {
 		var dcaVolume = 0;
-		for (j = 0; j < dcaLength; j++) {
-			dcaVolume += dcaDeposit / data[i + j][VALUE];
+		for (j = 0; j < dcaNumber; j++) {
+			dcaVolume += dcaDeposit / data[i + j * dcaPeriod][VALUE];
 		}
 		dcaProfits[i] = dcaVolume * data[i + dcaLength][VALUE] - dcaDepositsSum;
 		if (maxProfit < dcaProfits[i]) maxProfit = dcaProfits[i];
 		if (minProfit > dcaProfits[i]) minProfit = dcaProfits[i];
+		totalDcaProfitsSum+= dcaProfits[i];
 
 		var lumpVolume = dcaDepositsSum / data[i][VALUE];
 		lumpProfits[i] = lumpVolume * data[i + dcaLength][VALUE] - dcaDepositsSum;
 		if (maxProfit < lumpProfits[i]) maxProfit = lumpProfits[i];
 		if (minProfit > lumpProfits[i]) minProfit = lumpProfits[i];
+		totalLumpProfitsSum+= lumpProfits[i];
+		totalProtitsCount++;
 	}
+	dcaHistogram = [];
+	lumpHistogram = [];
+	histogramRanges = Math.round(histogramCanvas.width / 2);
+	for (var i = 0; i < histogramRanges; i++) {
+		dcaHistogram[i] = 0;
+		lumpHistogram[i] = 0;
+	}
+	var histogramStep = Math.max(0.001, (maxProfit - minProfit) / histogramRanges);
 	if (minProfit == maxProfit) {
 		minProfit-= dcaDepositSum / 20;
 		maxProfit+= dcaDepositSum / 20;
 	}
-
+	for (var i = startIndex; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= 1) {
+		var dcaHistogramIndex = Math.round((dcaProfits[i] - minProfit) / histogramStep);
+		dcaHistogram[dcaHistogramIndex]++;
+		var lumpHistogramIndex = Math.round((lumpProfits[i] - minProfit) / histogramStep);
+		lumpHistogram[lumpHistogramIndex]++;
+		if (maxHistogram < dcaHistogram[dcaHistogramIndex]) maxHistogram = dcaHistogram[dcaHistogramIndex];
+		if (maxHistogram < lumpHistogram[lumpHistogramIndex]) maxHistogram = lumpHistogram[lumpHistogramIndex];
+	}
 	dcaChartCtx.clearRect(0, 0, width, height);
 	//fixed scaling: 1 division = 10%
 	var showTens = (height / (maxProfit - minProfit)) > 2.2;
@@ -373,9 +417,10 @@ function drawDca() {
 	var oldLumpY = Math.round(height - (height/(maxProfit - minProfit) * (lumpProfits[startIndex] - minProfit)));
 	var oldDcaY = Math.round(height - (height/(maxProfit - minProfit) * (dcaProfits[startIndex] - minProfit)));
 	var cnt = 0;
+
+
 	for (var i = startIndex + dcaChartStep; i <= Math.min(endIndex, data.length - dcaLength - 1); i+= dcaChartStep) {
-		var x = getXFromI(i); //(width/(endIndex - startIndex + 1)) * cnt;
-		/* */
+		var x = getXFromI(i);
 		if (dcaProfits[i] > lumpProfits[i] && oldX < x) {
 			dcaChartCtx.beginPath();
 			dcaChartCtx.moveTo(x+0.5, 0);
@@ -383,7 +428,7 @@ function drawDca() {
 			dcaChartCtx.lineWidth = 0.9;
 			dcaChartCtx.strokeStyle = colors.dcaWinsBg;
 			dcaChartCtx.stroke();
-		}/* */
+		}
 		var lumpY = Math.round(height - (height/(maxProfit - minProfit) * (lumpProfits[i] - minProfit)));
 		var dcaY = Math.round(height - (height/(maxProfit - minProfit) * (dcaProfits[i] - minProfit)));
 		if (i%2) {
@@ -398,6 +443,86 @@ function drawDca() {
 		oldDcaY = dcaY;
 		oldLumpY = lumpY;
 	}
+
+	var histogramRangeWidth = histogramCanvas.width / histogramRanges;
+	histogramCtx.clearRect(0, 0, histogramCanvas.width, histogramCanvas.height);
+	var histogramTextOffsetY = 13;
+
+	var oldLumpHistY = histogramCanvas.height - histogramTextOffsetY;
+	for (var i = 0; i < histogramRanges; i++) {
+		lumpHistY = (histogramCanvas.height - histogramTextOffsetY) * (1 - lumpHistogram[i] / maxHistogram);
+
+		if (
+			lumpHistY < (histogramCanvas.height - histogramTextOffsetY)
+			|| oldLumpHistY < (histogramCanvas.height - histogramTextOffsetY)
+		) {
+			histogramCtx.fillStyle = colors.lumpChart;
+			histogramCtx.fillRect(
+				histogramRangeWidth * i - 0.5,
+				(histogramCanvas.height - histogramTextOffsetY) * (1 - lumpHistogram[i] / maxHistogram),
+				histogramRangeWidth + 1,
+				(histogramCanvas.height - histogramTextOffsetY) * (lumpHistogram[i] / maxHistogram),
+			);
+		}
+	}
+
+	var oldDcaHistY = (histogramCanvas.height - histogramTextOffsetY);
+	for (var i = 0; i < histogramRanges; i++) {
+		dcaHistY = (histogramCanvas.height - histogramTextOffsetY) * (1 - dcaHistogram[i] / maxHistogram);
+		if (
+			dcaHistY < (histogramCanvas.height - histogramTextOffsetY)
+			|| oldDcaHistY < (histogramCanvas.height - histogramTextOffsetY)
+		) {
+			histogramCtx.beginPath();
+			histogramCtx.moveTo(histogramRangeWidth * (i - 1), oldDcaHistY);
+			histogramCtx.lineTo(histogramRangeWidth * i, dcaHistY);
+			histogramCtx.strokeStyle = colors.dcaChart;
+			histogramCtx.lineWidth = 2;
+			histogramCtx.stroke();
+		}
+		oldDcaHistY = dcaHistY;
+	}
+
+	showTens = histogramCanvas.width / (maxProfit - minProfit) > 3.4;
+	for (var p = Math.floor(minProfit / 10)*10; p <= Math.ceil(maxProfit / 10)*10; p+= 10) {
+		var h = Math.round(histogramRangeWidth * (p - minProfit) / histogramStep);
+		histogramCtx.textAlign = 'center';
+		histogramCtx.beginPath();
+		histogramCtx.moveTo(h+0.5, 0);
+		histogramCtx.lineTo(h+0.5, (histogramCanvas.height - histogramTextOffsetY));
+		histogramCtx.lineWidth = 1;
+
+		if (p === 0) {
+			histogramCtx.font = '12px Arial';
+			histogramCtx.fillStyle = colors.profit0;
+			if (h > 14) histogramCtx.fillText('0', h, histogramCanvas.height);
+			histogramCtx.strokeStyle = colors.profit0;
+		} else if (p % 100 == 0) {
+			histogramCtx.font = '10px Arial';
+			histogramCtx.fillStyle = colors.text;
+			if (h > 14) histogramCtx.fillText((p>0?'+':'')+p+'%', h, histogramCanvas.height);
+			histogramCtx.strokeStyle = colors.profit100;
+		} else if (showTens && h > 14) {
+			histogramCtx.font = '10px Arial';
+			histogramCtx.fillStyle = colors.faintText;
+			histogramCtx.fillText((p>0?'+':'')+p+'%', h, histogramCanvas.height);
+			histogramCtx.strokeStyle = colors.profit10;
+		} else histogramCtx.strokeStyle = colors.profit10;
+		histogramCtx.stroke();
+	}
+
+	histogramCtx.font = '14px Arial';
+	histogramCtx.textAlign = 'end';
+	histogramCtx.fillStyle = colors.dcaChart;
+	histogramCtx.fillText(
+		'AVG DCA profit: '+(totalDcaProfitsSum > 0?'+':'')+Math.round(totalDcaProfitsSum / totalProtitsCount * 10)/10+'%',
+		histogramCanvas.width - 1, 15
+	);
+	histogramCtx.fillStyle = colors.lumpChart;
+	histogramCtx.fillText(
+		'AVG lump profit: '+(totalLumpProfitsSum > 0?'+':'')+Math.round(totalLumpProfitsSum / totalProtitsCount * 10)/10+'%',
+		histogramCanvas.width - 1, 29
+	);
 }
 function drawProfit(oldX, newX, oldY, newY, color) {
 	dcaChartCtx.beginPath();
@@ -415,11 +540,14 @@ window.onload = init;
 </div>
 <br>
 <label for="dcaPeriodInput">DCA every</label>
-<input id="dcaPeriod" type="range" min="1" max="92" style="width:400px" value="7">
-<input type="text" id="dcaPeriodInput" value="7" style="width:40px">
+<input id="dcaPeriod" type="range" min="1" max="92" style="width:400px" value="30">
+<input type="text" id="dcaPeriodInput" value="30" style="width:40px">
 days,
 <label for="dcaNumberInput">Number of payments:</label>
-<input id="dcaNumber" type="range" min="1" max="60" style="width:400px" value="10">
-<input type="text" id="dcaNumberInput" value="10" style="width:40px">
-<br>
+<input id="dcaNumber" type="range" min="2" max="60" style="width:400px" value="24">
+<input type="text" id="dcaNumberInput" value="24" style="width:40px">
+<br><br>
+DCA vs lump sum profit histograms:<br>
+<canvas id="histogramCanvas" width="600" height="200"></canvas>
+
 </body></html>
